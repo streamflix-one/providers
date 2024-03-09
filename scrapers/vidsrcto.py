@@ -5,6 +5,7 @@ from urllib.parse import unquote
 from typing import Union
 import re
 import time
+from urllib.parse import quote
 
 class VidsrcTo:
     def __init__(self):
@@ -23,14 +24,52 @@ class VidsrcTo:
             "upgrade-insecure-requests": "1"
         }
 
+
+    def get_embed_sources(self, id):
+      url = f"https://vidsrc.to/ajax/embed/episode/{id}/sources"
+  
+
+      response = requests.get(url, headers=self.headers)
+  
+      if response.status_code == 200:
+          # print("Request successful")
+          # print(response.text)
+          return response.json()["result"][0]["id"]
+      else:
+          # print(f"Request failed with status code {response.status_code}")
+          return None
+  
+    
+    def get_vidsrc_keys(self):
+      # print("Getting keys...")
+      url = "https://github.com/Ciarands/vidsrc-keys/blob/main/keys.json"
+      response = requests.get(url)
+      if response.status_code != 200:
+          # print(f"Failed to fetch content from {url}. Status code: {response.status_code}")
+          return None
+  
+      pattern = re.compile(r'"blob":{"rawLines":\["(.*?)"\]')
+      match = pattern.search(response.text)
+  
+      if match:
+          result_str = match.group(1)
+  
+          extracted_values = result_str.replace('\\', '').replace('"', '').strip("[").split(',')
+          return extracted_values[0], extracted_values[1]
+  
+      else:
+          # print("Pattern not found in the content.")
+          return None
+
     def get_id(self, tmdb_id, season=None, episode=None):
+        # print(f"Getting id for tmdb_id: {tmdb_id}")
         base_url = self.base_url
 
         if season and episode:
             url = f"{base_url}tv/{tmdb_id}/{season}/{episode}"
         else:
             url = f"{base_url}movie/{tmdb_id}"
-        print(url)
+        # print(url)
         response = requests.get(url, headers=self.headers)
 
         if response.status_code == 200:
@@ -40,7 +79,8 @@ class VidsrcTo:
 
             if a_element:
                 data_id = a_element.get('data-id')
-                return data_id
+                r = self.get_embed_sources(data_id)
+                return r
             else:
                 raise ValueError("Could not find the data-id attribute")
 
@@ -49,9 +89,10 @@ class VidsrcTo:
 
     def get_encrypted_sources(self, data_id):
         url = f"https://vidsrc.to/ajax/embed/source/{data_id}"
-
+        # print(url)
         response = requests.get(url, headers=self.headers)
         if response.status_code == 200:
+            # print(response.text)
             return response.json()["result"]["url"]  # Assuming the response is JSON
         else:
             raise ValueError(f"Failed to fetch data: {response.status_code}")
@@ -88,9 +129,7 @@ class VidsrcTo:
         furl = url
         url = url.split("?")
 
-        key1, key2 = requests.get(
-            f'https://raw.githubusercontent.com/Ciarands/vidsrc-keys/main/keys.json?token={int(time.time())}'
-        ).json()
+        key1, key2 = self.get_vidsrc_keys()
 
         decoded_id = self.decode_data(key1, url[0].split('/e/')[-1])
         encoded_result = self.decode_data(key2, decoded_id)
@@ -98,6 +137,7 @@ class VidsrcTo:
         key = encoded_base64.decode('utf-8').replace('/', '_')
 
         req = requests.get("https://vidplay.online/futoken", {"Referer": url})
+        # print(req.text)
         fu_key = re.search(r"var\s+k\s*=\s*'([^']+)'", req.text).group(1)
         data = f"{fu_key},{','.join([str(ord(fu_key[i % len(fu_key)]) + ord(key[i])) for i in range(len(key))])}"
 
@@ -108,7 +148,8 @@ class VidsrcTo:
         req_data = req.json()
 
         if type(req_data.get("result")) == dict:
-            return {'file': req_data.get("result").get("sources", [{}])[0].get("file")}
+            src = req_data.get("result").get("sources", [{}])[0].get("file").replace("#.mp4", "")
+            return  {'url': f'https://resp.streamflix.one/proxy/m3u8/{quote(src, safe="")}', 'source': 'VidsrcTo', 'proxy': 'True', 'lang': 'en', 'type': 'hls'}
         return 1401
 
 
@@ -152,8 +193,3 @@ class VidsrcTo:
 
         except Exception as e:
             return f"Error fetching sources: {e}"
-
-# Example usage:
-# scraper = VidsrcTo()
-# response_data = scraper.fetch_sources(108978, season=1, episode=1) 
-# print(response_data)

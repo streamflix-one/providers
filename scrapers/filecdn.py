@@ -4,11 +4,12 @@ import re
 class FileCDNScraper:
     def scrape_movie(self, tmdb_id):
         url = f'https://www.filecdn.cloud/e/tmdb{tmdb_id}dub'
-        return self._scrape(url)
+        return {'url': self._scrape(url), 'source': 'FileCDN - Movie', 'proxy': 'False', 'lang': 'pt', 'type': 'mp4'}
+
 
     def scrape_tv_show(self, tmdb_id, season, episode):
         url = f'https://www.filecdn.cloud/e/tvtmdb{tmdb_id}t{season}e{episode}dub'
-        return self._scrape(url)
+        return {'url': self._scrape(url), 'source': 'FileCDN - TV Show', 'proxy': 'False', 'lang': 'pt', 'type': 'mp4'}
 
     def _scrape(self, url):
         response = requests.get(url)
