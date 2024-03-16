@@ -28,10 +28,16 @@ StreamFlix Providers is a collection of scraper scripts that fetch streaming URL
      ```python
      scraper = VidsrcTo()
      response_data = scraper.fetch_source(108978, season=1, episode=1) 
-     print(f"Movie URL: {response_data}")
+     print(f"Tv Show URL: {response_data}")
 
      ```
-
+### Deploy on cloud providers
+[![Run on Replit](https://binbashbanana.github.io/deploy-buttons/buttons/remade/replit.svg)](https://replit.com/github/streamflix-one/providers)
+[![Remix on Glitch](https://binbashbanana.github.io/deploy-buttons/buttons/remade/glitch.svg)](https://glitch.com/edit/#!/import/github/streamflix-one/providers)
+[![Deploy on Railway](https://binbashbanana.github.io/deploy-buttons/buttons/remade/railway.svg)](https://railway.app/new/template?template=https://github.com/streamflix-one/providers)
+[![Deploy to Cyclic](https://binbashbanana.github.io/deploy-buttons/buttons/remade/cyclic.svg)](https://app.cyclic.sh/api/app/deploy/streamflix-one/providers)
+[![Deploy to Koyeb](https://binbashbanana.github.io/deploy-buttons/buttons/remade/koyeb.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/streamflix-one/providers&branch=main&name=Streamflix)
+[![Deploy to Render](https://binbashbanana.github.io/deploy-buttons/buttons/remade/render.svg)](https://render.com/deploy?repo=https://github.com/streamflix-one/providers)
 ### Contributing
 
 Contributions to StreamFlix Providers are welcome! If you'd like to contribute, follow these steps:

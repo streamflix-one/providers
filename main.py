@@ -9,7 +9,10 @@ from scrapers.frembed import FrEmbed
 from scrapers.twoembed import TwoEmbed
 from scrapers.azm import AzmTo
 from scrapers.meinecloud import MeineCloud
+from scrapers.vixcloud import VixCloud
+from scrapers.showflix import Showflix
 from scrapers.subtitles import get_subtitles
+from scrapers.downloads import Downloads
 import requests
 
 app = Flask(__name__)
@@ -28,7 +31,7 @@ def get_ip(request):
     return request.remote_addr
 
 
-def get_movie_name(tmdb_movie_id)
+def get_movie_name(tmdb_movie_id):
     base_url = "https://api.themoviedb.org/3/movie/"
     api_key_param = f"?api_key=f1dd7f2494de60ef4946ea81fd5ebaba"
 
@@ -42,15 +45,18 @@ def get_movie_name(tmdb_movie_id)
     if response.status_code == 200:
         movie_data = response.json()
         print(f"Fetching movie name for TMDB ID {tmdb_movie_id} took {elapsed_time:.4f} seconds")
-        return movie_data.get("original_title", "Movie not found")
+        return movie_data['title'], movie_data['release_date'].split("-")[0]
     else:
         print(f"Error: {response.status_code}. Fetching movie name for TMDB ID {tmdb_movie_id} took {elapsed_time:.4f} seconds")
         return f"Error: {response.status_code}"
 
 def scrape_sources(ip, tmdb_id, season=None, episode=None):
     start_time = time.time()  # Record the start time
-    title = get_movie_name(tmdb_id) if season is not None and episode is not None else None
-
+    if season is None and episode is None:
+        title, year = get_movie_name(tmdb_id)
+    else:
+        title, year = None, None    
+    print(title)
     try:
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
@@ -59,6 +65,8 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
             futures.append(executor.submit(vidsrc_scraper.fetch_sources, tmdb_id, season, episode))
 
             if season is None and episode is None:
+
+
                 meinecloud_scraper = MeineCloud(tmdb_api_key="f1dd7f2494de60ef4946ea81fd5ebaba")
                 futures.append(executor.submit(meinecloud_scraper.fetch_sources, ip, tmdb_id))
 
@@ -68,11 +76,18 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
                 frembed_scraper = FrEmbed()
                 futures.append(executor.submit(frembed_scraper.fetch_sources, tmdb_id, season, episode))
 
+                vixcloud_scraper = VixCloud()
+                futures.append(executor.submit(vixcloud_scraper.fetch_sources, title))
+
                 twoembed_scraper = TwoEmbed()
                 futures.append(executor.submit(twoembed_scraper.fetch_sources, tmdb_id, season, episode))
 
+                showflix_scraper = Showflix()
+                futures.append(executor.submit(showflix_scraper.fetch_sources, title))
+
                 azmto_scraper = AzmTo()
                 futures.append(executor.submit(azmto_scraper.fetch_sources, ip, title))
+                
             else:
                 filecdn_tv_show_scraper = FileCDNScraper()
                 futures.append(executor.submit(filecdn_tv_show_scraper.scrape_tv_show, tmdb_id, season, episode))
@@ -104,17 +119,20 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
 
 @app.route('/api/sources/<tmdb_id>', methods=['GET'])
 def scrape_movie_endpoint(tmdb_id):
+    movie_name, year = get_movie_name(tmdb_id)
     start_time = time.time()
     ip = get_ip(request)
 
     if not tmdb_id:
         return "Error: TMDB ID is required.", 400
-
+    dl_scraper = Downloads()
     sources = scrape_sources(ip, tmdb_id)
+    downloads = dl_scraper.scrape_movies(movie_name, year)
     subtitles = get_subtitles(tmdb_id)
     formatted_json = {
         'sources': sources,
-        'captions': subtitles
+        'captions': subtitles,
+        'downloads': downloads
     }
     end_time = time.time()  # record the end time
     elapsed_time = end_time - start_time

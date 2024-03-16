@@ -20,7 +20,7 @@ class MeineCloud:
             doodstream = Doodstream(formatted_url, user_ip)
             r = doodstream.main().split("\n")[0]
             print(r)
-            return {'url': f'{r}#.mp4', 'source': 'MeineCloud', 'proxy': 'False', 'lang': 'de', 'type': 'mp4'}
+            return {'url': f'{r}', 'source': 'MeineCloud', 'proxy': 'False', 'lang': 'de', 'type': 'mp4'}
         else:
             return None
 

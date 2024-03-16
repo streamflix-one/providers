@@ -149,7 +149,8 @@ class VidsrcTo:
 
         if type(req_data.get("result")) == dict:
             src = req_data.get("result").get("sources", [{}])[0].get("file").replace("#.mp4", "")
-            return  {'url': f'https://resp.streamflix.one/proxy/m3u8/{quote(src, safe="")}', 'source': 'VidsrcTo', 'proxy': 'True', 'lang': 'en', 'type': 'hls'}
+            thumbnails = req_data.get("result").get("tracks", [{}])[0].get("file").replace("#.mp4", "")
+            return  {'url': src, 'source': 'VidsrcTo', 'proxy': 'True', 'lang': 'en', 'type': 'hls', 'thumbnails': thumbnails}
         return 1401
 
 
