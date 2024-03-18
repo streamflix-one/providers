@@ -111,6 +111,6 @@ class Doodstream:
         response = requests.get(f"{md5_url}", headers=self.md5_headers)
         expiry_timestamp = int(time.time() * 1000)
 
-        constructed_url = f"{response.text}{self.generate_random_string(10)}?token={data_for_later}&expiry={expiry_timestamp}"
+        constructed_url = f"{response.text}{self.generate_random_string(10)}?token={data_for_later}&expiry={expiry_timestamp}#.mp4"
         # print(constructed_url)
         return constructed_url

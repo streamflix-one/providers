@@ -2,8 +2,9 @@ import requests
 import re
 
 class Streamwish:
-    def __init__(self, url):
+    def __init__(self, url, ip):
         self.url = url
+        self.user_ip = ip
 
     def main(self):
         headers = {
@@ -21,6 +22,7 @@ class Streamwish:
             "Sec-Fetch-User": "?1",
             "Sec-GPC": "1",
             "Upgrade-Insecure-Requests": "1",
+            "X-Forwarded-For": self.user_ip,
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
 

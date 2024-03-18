@@ -15,6 +15,7 @@ from scrapers.subtitles import get_subtitles
 from scrapers.downloads import Downloads
 import requests
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -50,6 +51,14 @@ def get_movie_name(tmdb_movie_id):
         print(f"Error: {response.status_code}. Fetching movie name for TMDB ID {tmdb_movie_id} took {elapsed_time:.4f} seconds")
         return f"Error: {response.status_code}"
 
+def add_server_num(server_num, source):
+    try:
+        source['server'] = server_num
+    except Exception as e:
+        print(f"Error while adding server number {server_num} to source: {e}")
+    return source
+
+
 def scrape_sources(ip, tmdb_id, season=None, episode=None):
     start_time = time.time()  # Record the start time
     if season is None and episode is None:
@@ -80,10 +89,10 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
                 futures.append(executor.submit(vixcloud_scraper.fetch_sources, title))
 
                 twoembed_scraper = TwoEmbed()
-                futures.append(executor.submit(twoembed_scraper.fetch_sources, tmdb_id, season, episode))
+                futures.append(executor.submit(twoembed_scraper.fetch_sources, tmdb_id, ip, season, episode))
 
                 showflix_scraper = Showflix()
-                futures.append(executor.submit(showflix_scraper.fetch_sources, title))
+                futures.append(executor.submit(showflix_scraper.fetch_sources, title, ip))
 
                 azmto_scraper = AzmTo()
                 futures.append(executor.submit(azmto_scraper.fetch_sources, ip, title))
@@ -98,13 +107,17 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
             concurrent.futures.wait(futures)
 
             sources = []
+            server = 1
             for future in futures:
                 try:
                     result = future.result()
                     if result:
-                        sources.append(result)
+                        # print(result)
+                        sources.append(add_server_num(server, result))
+                    server += 1    
                 except Exception as e:
                     print(f"Error in scraper: {e}")
+                    server += 1
 
             end_time = time.time() 
             elapsed_time = end_time - start_time
@@ -165,4 +178,4 @@ def scrape_tv_show_endpoint(tmdb_id, season, episode):
         return "Error scraping sources.", 500
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8000)

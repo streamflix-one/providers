@@ -24,7 +24,7 @@ class Showflix:
 
         self.url = "https://parse.showflix.online/parse/classes/movies"
 
-    def fetch_sources(self, movie_name):
+    def fetch_sources(self, movie_name, user_ip):
         data = {
             "where": {
                 "movieName": {
@@ -61,7 +61,7 @@ class Showflix:
 
                 # Ensure streamwish key is not None before accessing it
                 if streaming_ids.get('streamwish'):
-                    showflix = Streamwish(f"https://embedwish.com/e/{streaming_ids['streamwish']}.html")
+                    showflix = Streamwish(f"https://embedwish.com/e/{streaming_ids['streamwish']}.html", user_ip)
                     hls_url = showflix.main()
                     return {'url': hls_url, 'source': 'ShowFlix', 'proxy': 'True', 'lang': streaming_ids['language'], 'type': 'hls'}
                 else:

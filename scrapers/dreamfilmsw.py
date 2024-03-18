@@ -175,7 +175,7 @@ class DreamFilmSW:
 
                 if iframe_content:
                     m3u8_link = self.extract_m3u8_link(iframe_content)
-                    return {'url': m3u8_link, 'source': 'DreamFilmSW', 'proxy': 'True', 'lang': 'en', 'type': 'hls'}
+                    return {'url': f'https://m3u8.justchill.workers.dev/?url={m3u8_link}&referer=vidmoly.me', 'source': 'DreamFilmSW', 'proxy': 'True', 'lang': 'en', 'type': 'hls'}
 
 # Example usage
 # scraper = DreamFilmSW()

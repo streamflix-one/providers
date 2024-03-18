@@ -26,10 +26,14 @@ class TwoEmbed:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
         }
 
-    def fetch_content_with_id(self, video_id):
+    def fetch_content_with_id(self, video_id, user_ip):
         url = f"{self.base_url}{video_id}"
         try:
-            response = self.session.get(url, headers=self.default_headers)
+            headers = {
+                "X-Forwarded-For": user_ip
+            }
+            headers.update(self.default_headers)
+            response = self.session.get(url, headers=headers)
             response.raise_for_status()
             return response.text
         except requests.exceptions.RequestException as e:
@@ -50,7 +54,7 @@ class TwoEmbed:
             print(f"Error fetching IMDb ID from TMDB: {e}")
             return None
 
-    def fetch_sources(self, tmdb_id, season=None, episode=None):
+    def fetch_sources(self, tmdb_id, user_ip, season=None, episode=None):
         imdb_id = self.tmdb_to_imdb(tmdb_id)
 
         if imdb_id:
@@ -82,7 +86,7 @@ class TwoEmbed:
                 stripped_urls = [url.replace('https://streamsrcs.2embed.cc/swish-autostream?id=', '') for url in urls]
 
                 if stripped_urls:
-                    uqcloud_content = self.fetch_content_with_id(stripped_urls[0])
+                    uqcloud_content = self.fetch_content_with_id(stripped_urls[0], user_ip)
                     m3u8_urls = re.findall(r'file:\s*"([^"]+)"', uqcloud_content)
 
                     if m3u8_urls:
