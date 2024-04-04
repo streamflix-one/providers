@@ -168,7 +168,7 @@ class VidsrcTo:
             encoded = bytearray(binary_data)
 
             # SPECIAL [KEY]
-            key_bytes = bytes('8z5Ag5wgagfsOuhz', 'utf-8')
+            key_bytes = bytes('WXrUARXb1aDLaZjI', 'utf-8')
             j = 0
             s = bytearray(range(256))
 

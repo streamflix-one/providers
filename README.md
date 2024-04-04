@@ -8,7 +8,81 @@
 
 StreamFlix Providers is a collection of scraper scripts that fetch streaming URLs from various online streaming platforms. These scripts allow you to extract video URLs from platforms like FileCDN and Vidsrc.to, facilitating the process of integrating streaming functionality into your applications or projects.
 
-### How to Use
+
+## Features
+
+- **Streaming URL Retrieval**: Fetch streaming URLs from popular online streaming platforms.
+- **Subtitle Support**: Retrieve subtitles for movies and TV shows.
+- **Download Options**: Provide direct download links for content.
+- **Scalable and Efficient**: Designed to handle multiple requests with minimal latency.
+
+## Getting Started
+
+### Installation
+
+To use StreamFlix API, follow these steps:
+
+1. Clone this repository to your local machine.
+2. Install the required dependencies by running `pip install -r requirements.txt`.
+3. Run the Flask server using `python3 main.py`.
+
+### Usage
+
+#### Fetching Streaming URLs for Movies
+
+To fetch streaming URLs for a movie, make a GET request to the `/api/sources/<tmdb_id>` endpoint, where `<tmdb_id>` is the TMDB ID of the movie.
+
+Example:
+
+```http
+GET /api/sources/12345
+```
+
+#### Fetching Streaming URLs for TV Shows
+
+To fetch streaming URLs for a TV show episode, make a GET request to the `/api/sources/<tmdb_id>/<season>/<episode>` endpoint, where `<tmdb_id>` is the TMDB ID of the TV show, `<season>` is the season number, and `<episode>` is the episode number.
+
+Example:
+
+```http
+GET /api/sources/67890/1/1
+```
+
+### API Responses
+
+The API will respond with a JSON object containing the streaming URLs, subtitles (if available), and download options (if configured).
+
+Example Response:
+
+```json
+{
+  "sources": [
+    {
+      "server": 1,
+      "url": "https://example.com/stream1"
+    },
+    {
+      "server": 2,
+      "url": "https://example.com/stream2"
+    }
+  ],
+  "captions": [
+    {
+      "language": "English",
+      "url": "https://example.com/subtitles/en.srt"
+    }
+  ],
+  "downloads": [
+    {
+      "quality": "1080p",
+      "url": "https://example.com/downloads/movie.mp4"
+    }
+  ]
+}
+```
+
+
+### How to Use the Scrapers
 
 1. **Download and Set Up**
    - Download the StreamFlix Providers `scrapers` folder from the repository.
