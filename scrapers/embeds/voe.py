@@ -3,8 +3,8 @@ import requests
 
 class Voe:
     def __init__(self, url):
-        self.url = url.replace("voe.sx", "vincentincludesuccessful.com")
-        self.domain = "vincentincludesuccessful.com"
+        self.url = url.replace("voe.sx", "brookethoughi.com")
+        self.domain = "brookethoughi.com"
         self.headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
             "Accept-Language": "en-GB,en;q=0.6",
@@ -53,7 +53,7 @@ class Voe:
             return mp4_url
         else:
             return None
-
+            
 # Example usage:
 # voe = Voe("https://voe.sx/e/qsci3b0zpz2i")
 # hls_url = voe.main()

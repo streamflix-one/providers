@@ -1,31 +1,34 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import cloudscraper
 
 class DreamFilmSW:
     def __init__(self):
         self.php_session_id = self.get_php_session_id("https://dreamfilmsw.net/")
 
     def get_iframe_source(self, iframe_src):
+        scraper = cloudscraper.create_scraper()
         headers = {
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            "accept-language": "en-GB,en;q=0.6",
-            "sec-ch-ua": "\"Chromium\";v=\"122\", \"Not(A:Brand\";v=\"24\", \"Brave\";v=\"122\"",
-            "sec-ch-ua-mobile": "?1",
-            "sec-ch-ua-platform": "\"Android\"",
-            "sec-fetch-dest": "document",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-site": "same-origin",
-            "sec-fetch-user": "?1",
-            "sec-gpc": "1",
-            "upgrade-insecure-requests": "1",
-            "cookie": f"PHPSESSID={self.php_session_id}",
-            "Referer": iframe_src.replace(".to/", ".me/"),
-            "Referrer-Policy": "strict-origin-when-cross-origin"
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "Accept-Language": "en-GB,en;q=0.8",
+            "Connection": "keep-alive",
+            "Host": "vidmoly.net",
+            "Referer": "https://dreamfilmsw.net/",
+            "sec-ch-ua": '"Brave";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "Sec-Fetch-Dest": "iframe",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "cross-site",
+            "Sec-Fetch-User": "?1",
+            "Sec-GPC": "1",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
         }
 
-        response = requests.get(iframe_src.replace(".to/", ".net/"), headers=headers)
 
+        response = requests.get(iframe_src.replace('.to', '.net'), headers=headers)
         if response.status_code == 200:
             return response.text
         else:

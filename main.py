@@ -11,6 +11,7 @@ from scrapers.azm import AzmTo
 from scrapers.meinecloud import MeineCloud
 from scrapers.vixcloud import VixCloud
 from scrapers.showflix import Showflix
+from scrapers.streamium import Streamium
 from scrapers.subtitles import get_subtitles
 from scrapers.downloads import Downloads
 import requests
@@ -75,6 +76,8 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
 
             if season is None and episode is None:
 
+                streamium_scraper = Streamium("f1dd7f2494de60ef4946ea81fd5ebaba")
+                futures.append(executor.submit(streamium_scraper.fetch_sources, tmdb_id))
 
                 meinecloud_scraper = MeineCloud(tmdb_api_key="f1dd7f2494de60ef4946ea81fd5ebaba")
                 futures.append(executor.submit(meinecloud_scraper.fetch_sources, ip, tmdb_id))

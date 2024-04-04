@@ -7,7 +7,7 @@ import time
 class Doodstream:
     def __init__(self, doodstream_url, my_ip):
         self.doodstream_url = doodstream_url
-        self.url = doodstream_url.replace("d0o0d.com", "d0000d.com")
+        self.url = f"https://d0000d.com/e/{doodstream_url.split('/e/')[1]}"
         self.my_ip = my_ip
 
         self.base_headers = {
