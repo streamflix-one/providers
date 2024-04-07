@@ -27,10 +27,10 @@ class VidsrcTo:
 
     def get_embed_sources(self, id):
       url = f"https://vidsrc.to/ajax/embed/episode/{id}/sources"
-  
+
 
       response = requests.get(url, headers=self.headers)
-  
+
       if response.status_code == 200:
           # print("Request successful")
           # print(response.text)
@@ -38,8 +38,8 @@ class VidsrcTo:
       else:
           # print(f"Request failed with status code {response.status_code}")
           return None
-  
-    
+
+
     def get_vidsrc_keys(self):
       # print("Getting keys...")
       url = "https://github.com/Ciarands/vidsrc-keys/blob/main/keys.json"
@@ -47,16 +47,16 @@ class VidsrcTo:
       if response.status_code != 200:
           # print(f"Failed to fetch content from {url}. Status code: {response.status_code}")
           return None
-  
+
       pattern = re.compile(r'"blob":{"rawLines":\["(.*?)"\]')
       match = pattern.search(response.text)
-  
+
       if match:
           result_str = match.group(1)
-  
+
           extracted_values = result_str.replace('\\', '').replace('"', '').strip("[").split(',')
           return extracted_values[0], extracted_values[1]
-  
+
       else:
           # print("Pattern not found in the content.")
           return None
@@ -125,7 +125,7 @@ class VidsrcTo:
 
         return decoded
 
-    def handle_vidplay(self, url) -> str:
+    def handle_vidplay(self, url, provider_base) -> str:
         furl = url
         url = url.split("?")
 
@@ -135,14 +135,14 @@ class VidsrcTo:
         encoded_result = self.decode_data(key2, decoded_id)
         encoded_base64 = base64.b64encode(encoded_result)
         key = encoded_base64.decode('utf-8').replace('/', '_')
-
-        req = requests.get("https://vidplay.online/futoken", {"Referer": url})
-        # print(req.text)
+        # print(furl)
+        req = requests.get(f"{provider_base}/futoken", headers={"Referer": furl})
         fu_key = re.search(r"var\s+k\s*=\s*'([^']+)'", req.text).group(1)
+
         data = f"{fu_key},{','.join([str(ord(fu_key[i % len(fu_key)]) + ord(key[i])) for i in range(len(key))])}"
 
         req = requests.get(
-            f"https://vidplay.online/mediainfo/{data}?{url[1]}&autostart=true",
+            f"{provider_base}/mediainfo/{data}?{url[1]}&autostart=true",
             headers={"Referer": furl}
         )
         req_data = req.json()
@@ -189,8 +189,10 @@ class VidsrcTo:
 
             decoded_text = decoded.decode('utf-8')
             unquoted_text = unquote(decoded_text)
-
-            return self.handle_vidplay(unquoted_text)
+            # print(unquoted_text)
+            provider_base = unquoted_text.split('/e/')[0]
+            return self.handle_vidplay(unquoted_text, provider_base)
 
         except Exception as e:
             return f"Error fetching sources: {e}"
+
