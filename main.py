@@ -3,6 +3,7 @@ from flask_cors import CORS
 import concurrent.futures
 import time
 from scrapers.vidsrcto import VidsrcTo
+from scrapers.vidsrcme import VidSrcMe
 from scrapers.filecdn import FileCDNScraper
 from scrapers.dreamfilmsw import DreamFilmSW
 from scrapers.frembed import FrEmbed
@@ -71,8 +72,10 @@ def scrape_sources(ip, tmdb_id, season=None, episode=None):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
 
-            vidsrc_scraper = VidsrcTo()
-            futures.append(executor.submit(vidsrc_scraper.fetch_sources, tmdb_id, season, episode))
+            vidsrcto_scraper = VidsrcTo()
+            futures.append(executor.submit(vidsrcto_scraper.fetch_sources, tmdb_id, season, episode))
+            vidsrcme_scraper = VidSrcMe()
+            futures.append(executor.submit(vidsrcme_scraper.fetch_sources, tmdb_id, season, episode))
 
             if season is None and episode is None:
 
