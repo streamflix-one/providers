@@ -53,7 +53,7 @@ class VidSrcMe:
         requests.get(hls_password_url, headers={"Referer": referrer})
 
         return hls_url
-
+        
     def fetch_sources(self, tmdb_id, season=None, episode=None):
         if season is None and episode is None:
           url = f"https://vidsrc.xyz/embed/movie/{tmdb_id}"
@@ -85,7 +85,7 @@ class VidSrcMe:
         soup = BeautifulSoup(html_content, 'html.parser')
         iframe_tag = soup.find('iframe', id='player_iframe')
         iframe_src = f"https:{iframe_tag['src']}"
-
+        print(iframe_src)
         src = self.fetch(iframe_src)
         soup = BeautifulSoup(src, 'html.parser')
         cf_turnstile_div = soup.find('div', class_='cf-turnstile', attrs={'data-sitekey': '0x4AAAAAAATD6DukOTUdZEnE', 'data-callback': 'cftCallback'})
@@ -107,12 +107,19 @@ class VidSrcMe:
 
             src = self.fetch(iframe_src)
 
-        soup = BeautifulSoup(src, "html.parser")
-        encoded = soup.find("div", {"id": "hidden"}).get("data-h")
-        seed = soup.find("body").get("data-i")
+        # soup = BeautifulSoup(src, "html.parser")
+        # encoded = soup.find("div", {"id": "hidden"}).get("data-h")
+        # seed = soup.find("body").get("data-i")
 
-        source = self.decode_src(encoded, seed)
-
+        # source = self.decode_src(encoded, seed)
+        match = re.search(r"src:\s*'([^']+)'", src)
+  
+        if match:
+            source = match.group(1)
+            print("Source URL:", source)
+        else:
+            print("Source URL not found.")
+            source = ""
         if source.startswith("//"):
             source = f"https:{source}"
 
